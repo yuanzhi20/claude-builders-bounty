@@ -1,13 +1,21 @@
 ---
 name: generate-changelog
 description: Auto-generate structured CHANGELOG.md from git history since last tag.
+triggers:
+  - /generate-changelog
 ---
 
 # generate-changelog
 
 Generate a structured `CHANGELOG.md` from git commit history.
 
-## Usage
+## Trigger
+
+```
+/generate-changelog
+```
+
+Or run manually:
 
 ```bash
 python3 changelog-tool/generate_changelog.py
@@ -23,3 +31,11 @@ python3 changelog-tool/generate_changelog.py
    - **Changed**: update, improve, refactor, rename
    - **Removed**: remove, delete, drop, deprecate
 4. Generates a formatted CHANGELOG.md (prepends to existing)
+
+## Setup
+
+```bash
+cp -r changelog-tool/ your-project/
+```
+
+Then use `/generate-changelog` in Claude Code or run `python3 changelog-tool/generate_changelog.py`.
