@@ -1,64 +1,26 @@
-# Claude Code Pre-Tool-Use Hooks
+# Pre-Tool-Use Guard Hook
 
-## Installation
+Blocks dangerous bash commands before Claude Code executes them.
 
-### Quick Install (One Command)
-
-```bash
-mkdir -p ~/.claude/hooks && cp -r hooks/* ~/.claude/hooks/ && chmod +x ~/.claude/hooks/pre-tool-use/*.sh
-```
-
-### Manual Install
+## Install (1 command)
 
 ```bash
-# 1. Create hooks directory
-mkdir -p ~/.claude/hooks
-
-# 2. Copy hooks
-cp -r hooks/* ~/.claude/hooks/
-
-# 3. Make scripts executable
-chmod +x ~/.claude/hooks/pre-tool-use/*.sh
+cp -r hooks/ ~/.claude/hooks/ && chmod +x ~/.claude/hooks/pre-tool-use-guard.sh
 ```
 
-## Available Hooks
+## What It Blocks
 
-### `dangerous-command-guard.sh`
+- `rm -rf /` / `rm -rf ~` — Recursive root/home deletion
+- `DROP TABLE` / `TRUNCATE` — Database destruction
+- `git push --force` — Force push (history rewrite)
+- `DELETE FROM` without WHERE — Mass data deletion
+- `mkfs` / `dd if=` — Disk formatting
+- `chmod -R 777 /` — Permission destruction
+- Fork bombs
 
-Blocks destructive commands before execution:
+## How It Works
 
-- `rm -rf /` - Deleting root filesystem
-- `DROP TABLE/DATABASE/SCHEMA` - SQL destruction
-- `TRUNCATE` - SQL table truncation
-- `git push --force` - Force pushing to git
-- `DELETE FROM` without WHERE clause - Deleting all rows
-
-Blocked commands are logged to `~/.claude/hooks/blocked.log`.
-
-## Hook Format Reference
-
-Claude Code pre-tool-use hooks receive JSON on stdin:
-
-```json
-{
-  "tool_name": "Bash",
-  "tool_input": {
-    "command": "rm -rf /"
-  }
-}
-```
-
-And respond with JSON on stdout:
-
-```json
-{
-  "decision": "block",
-  "reason": "Dangerous command detected"
-}
-```
-
-## Uninstall
-
-```bash
-rm -rf ~/.claude/hooks/pre-tool-use/dangerous-command-guard.sh
-```
+1. Reads tool input from stdin (Claude Code hooks format)
+2. Checks command against dangerous patterns
+3. Blocks and logs to `~/.claude/hooks/blocked.log`
+4. Allows all normal commands without interference
